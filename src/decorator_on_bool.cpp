@@ -24,11 +24,11 @@
 #include <behaviortree_cpp_v3/bt_factory.h>
 #include <behaviortree_cpp_v3/decorator_node.h>
 
-#include <ergocub_nav2_nodes/decorator_on_bool.hpp>
+#include <bt_nav2_ergocub/decorator_on_bool.hpp>
 
 using namespace std::literals::chrono_literals;  // for "s" literals 
 
-namespace ergocub_nav2_nodes
+namespace bt_nav2_ergocub
 {
 
    DecoratorOnBool::DecoratorOnBool(const std::string& name, const BT::NodeConfiguration& conf)
@@ -109,5 +109,5 @@ namespace ergocub_nav2_nodes
 
 BT_REGISTER_NODES(factory)
 {
-   factory.registerNodeType<ergocub_nav2_nodes::DecoratorOnBool>("DecoratorOnBool");
+   factory.registerNodeType<bt_nav2_ergocub::DecoratorOnBool>("DecoratorOnBool");
 }

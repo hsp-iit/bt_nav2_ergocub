@@ -62,10 +62,10 @@ BT::NodeStatus IsPathValidConditionModded::tick()
   return BT::NodeStatus::FAILURE;
 }
 
-}  // namespace ergocub_nav2_nodes
+}  // namespace bt_nav2_ergocub
 
 #include "behaviortree_cpp_v3/bt_factory.h"
 BT_REGISTER_NODES(factory)
 {
-  factory.registerNodeType<ergocub_nav2_nodes::IsPathValidConditionModded>("IsPathValidConditionModded");
+  factory.registerNodeType<bt_nav2_ergocub::IsPathValidConditionModded>("IsPathValidConditionModded");
 }
