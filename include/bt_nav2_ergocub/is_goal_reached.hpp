@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef BT_NAV2_ERGOCUB__GOAL_REACHED_CONDITION_MODDED_HPP_
-#define BT_NAV2_ERGOCUB__GOAL_REACHED_CONDITION_MODDED_HPP_
+#ifndef ERGOCUB_NAV2_NODES__GOAL_REACHED_CONDITION_MODDED_HPP_
+#define ERGOCUB_NAV2_NODES__GOAL_REACHED_CONDITION_MODDED_HPP_
 
 #include <string>
 #include <memory>
@@ -21,10 +21,9 @@
 #include "rclcpp/rclcpp.hpp"
 #include "behaviortree_cpp_v3/condition_node.h"
 #include "tf2_ros/buffer.h"
-#include "geometry_msgs/msg/pose_stamped.hpp"
 #include "std_msgs/msg/bool.hpp"
 
-namespace bt_nav2_ergocub
+namespace ergocub_nav2_nodes
 {
 
 /**
@@ -96,9 +95,10 @@ private:
   std::string global_frame_;
   std::string robot_base_frame_;
   double transform_tolerance_;
+  
   rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr goal_state_pub_;
 };
 
-}  // namespace
+}  // namespace ergocub_nav2_nodes
 
-#endif  // BT_NAV2_ERGOCUBS__GOAL_REACHED_CONDITION_MODDED_HPP_
+#endif  // ERGOCUB_NAV2_NODES__GOAL_REACHED_CONDITION_MODDED_HPP_
