@@ -19,7 +19,7 @@
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "nav2_util/node_utils.hpp"
 
-#include "ergocub_nav2_nodes/is_goal_reached.hpp"
+#include "bt_nav2_ergocub/is_goal_reached.hpp"
 
 namespace ergocub_nav2_nodes
 {
