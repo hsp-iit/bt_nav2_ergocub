@@ -5,15 +5,15 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/include/**",
-                "/opt/ros/iron/include/**",
+                "/opt/ros/humble/include/**",
                 "/usr/include/eigen3/**",
                 "/usr/include/pcl-1.12/**",
-                "/home/user1/nav2_ws/**",
-                "/opt/ros/iron/include/nav_msgs"
+                "/opt/ros/humble/include/nav_msgs",
+                "/home/ecub_docker/robotology-superbuild/build/install/include/"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
-            "cStandard": "gnu17",
+            "cStandard": "c17",
             "cppStandard": "gnu++17",
             "intelliSenseMode": "linux-gcc-x64"
         }

@@ -21,6 +21,9 @@
 
 #include "bt_nav2_ergocub/is_goal_reached.hpp"
 
+#include "yarp/os/Network.h"
+#include "tf2/LinearMath/Matrix3x3.h"
+
 namespace ergocub_nav2_nodes
 {
 
@@ -38,18 +41,35 @@ GoalReachedConditionModded::GoalReachedConditionModded(
 
 GoalReachedConditionModded::~GoalReachedConditionModded()
 {
+  //yarp.fini();
   cleanup();
 }
 
 void GoalReachedConditionModded::initialize()
 {
+  //yarp.init();
   node_ = config().blackboard->get<rclcpp::Node::SharedPtr>("node");
+
+  nav2_util::declare_parameter_if_not_declared(
+    node_, "nav_status_port_name",
+    rclcpp::ParameterValue("/is_goal_reached_bt/goal_reached:o"));
+  node_->get_parameter_or<std::string>("nav_status_port_name", nav_status_port_name_);
+
+  nav2_util::declare_parameter_if_not_declared(
+    node_, "goal_angular_tol",
+    rclcpp::ParameterValue(0.14));
+  node_->get_parameter_or<double>("goal_reached_tol", goal_angular_tol_);
+  std::cout << "[GoalReachedConditionModded] goal_reached_tol: " << goal_angular_tol_ << std::endl;
 
   nav2_util::declare_parameter_if_not_declared(
     node_, "goal_reached_tol",
     rclcpp::ParameterValue(0.3));
   node_->get_parameter_or<double>("goal_reached_tol", goal_reached_tol_, 0.20);
+
   tf_ = config().blackboard->get<std::shared_ptr<tf2_ros::Buffer>>("tf_buffer");
+
+  yarp_port_.open(nav_status_port_name_);
+  // TODO connection check -> done by input
 
   node_->get_parameter("transform_tolerance", transform_tolerance_);
 
@@ -89,11 +109,34 @@ bool GoalReachedConditionModded::isGoalReached()
   getInput("goal", goal);
   double dx = goal.pose.position.x - current_pose.pose.position.x;
   double dy = goal.pose.position.y - current_pose.pose.position.y;
+  //orientation handling
+  tf2::Quaternion q_goal;
+  tf2::fromMsg(goal.pose.orientation, q_goal);
+  tf2::Quaternion q_pose;
+  tf2::fromMsg(goal.pose.orientation, q_pose);
+  tf2::Matrix3x3 m(q_goal*q_pose.inverse());
+  double r, p, yaw;
+  m.getRPY(r, p, yaw);
+  std::cout << "[GoalReachedConditionModded] relative yaw difference rad: " << yaw << " degrees: " << yaw * 180 / M_PI << std::endl;
   std::cout << "[GoalReachedConditionModded] Goal X: " << goal.pose.position.x << " Y: " << goal.pose.position.y << std::endl;
   std::cout << "[GoalReachedConditionModded] Current Pose X: " << current_pose.pose.position.x << " Y: " << current_pose.pose.position.y << std::endl;
   std::cout << "[GoalReachedConditionModded] Distance: " << std::sqrt(dx * dx + dy * dy) << std::endl;
   std::cout << "[GoalReachedConditionModded] Global Frame: " << global_frame_ << " Robot Frame: " << robot_base_frame_ << std::endl;
-  return (dx * dx + dy * dy) <= (goal_reached_tol_ * goal_reached_tol_);
+
+  if ((dx * dx + dy * dy) <= (goal_reached_tol_ * goal_reached_tol_) && (std::abs(yaw) <= goal_angular_tol_))
+  {
+    auto& out = yarp_port_.prepare();
+    out.clear();
+    out.addInt16(1);
+    return true;
+  }
+  else
+  {
+    auto& out = yarp_port_.prepare();
+    out.clear();
+    out.addInt16(0);
+    return false;
+  }
 }
 
 }  // namespace ergocub_nav2_nodes

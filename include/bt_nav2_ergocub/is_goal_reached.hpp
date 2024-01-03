@@ -23,6 +23,10 @@
 #include "tf2_ros/buffer.h"
 #include "std_msgs/msg/bool.hpp"
 
+#include "yarp/os/BufferedPort.h"
+#include "yarp/os/Network.h"
+#include "yarp/os/Bottle.h"
+
 namespace ergocub_nav2_nodes
 {
 
@@ -95,6 +99,12 @@ private:
   std::string global_frame_;
   std::string robot_base_frame_;
   double transform_tolerance_;
+
+  std::string nav_status_port_name_;
+  double goal_angular_tol_;
+
+  yarp::os::Network yarp;
+  yarp::os::BufferedPort<yarp::os::Bottle> yarp_port_;
   
   rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr goal_state_pub_;
 };
