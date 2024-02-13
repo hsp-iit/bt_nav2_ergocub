@@ -35,6 +35,7 @@ GoalReachedConditionModded::GoalReachedConditionModded(
   global_frame_("map"),
   robot_base_frame_("base_link")
 {
+  publish_info_ = false;
   getInput("global_frame", global_frame_);
   getInput("robot_base_frame", robot_base_frame_);
 }
@@ -62,6 +63,16 @@ void GoalReachedConditionModded::initialize()
   std::cout << "[GoalReachedConditionModded] nav_status_port_name: " << nav_status_port_name_ << std::endl;
 
   nav2_util::declare_parameter_if_not_declared(
+    node_, "perception_bt_port_name",
+    rclcpp::ParameterValue("/BT/RobotNavigating"));
+  node_->get_parameter<std::string>("perception_bt_port_name", perception_bt_port_name_);
+  if (perception_bt_port_name_=="")
+  {
+    perception_bt_port_name_ = "/BT/RobotNavigating";
+  }
+  std::cout << "[GoalReachedConditionModded] nav_status_port_name: " << perception_bt_port_name_ << std::endl;
+
+  nav2_util::declare_parameter_if_not_declared(
     node_, "goal_angular_tol",
     rclcpp::ParameterValue(0.14));
   node_->get_parameter<double>("goal_angular_tol", goal_angular_tol_);
@@ -84,7 +95,17 @@ void GoalReachedConditionModded::initialize()
   tf_ = config().blackboard->get<std::shared_ptr<tf2_ros::Buffer>>("tf_buffer");
 
   yarp_port_.open(nav_status_port_name_);
-  // TODO connection check -> done by input
+  // YARP connection check
+  yarp::os::Network::connect(nav_status_port_name_, perception_bt_port_name_);
+  if(yarp::os::Network::isConnected(nav_status_port_name_, perception_bt_port_name_))
+  {
+      RCLCPP_INFO(node_->get_logger(), "YARP Ports connected successfully");
+      publish_info_ = true;
+  } 
+  else 
+  {
+    publish_info_=false;
+  }
 
   node_->get_parameter("transform_tolerance", transform_tolerance_);
 
@@ -146,19 +167,60 @@ bool GoalReachedConditionModded::isGoalReached()
   std::cout << "[GoalReachedConditionModded] Distance: " << std::sqrt(dx * dx + dy * dy) << std::endl;
   std::cout << "[GoalReachedConditionModded] Global Frame: " << global_frame_ << " Robot Frame: " << robot_base_frame_ << std::endl;
 
-  if ((dx * dx + dy * dy) <= (goal_reached_tol_ * goal_reached_tol_) && (std::abs(yaw) <= goal_angular_tol_))
+  //if we have to check for angular alignment
+  if (check_angular_alignment_)
   {
-    auto& out = yarp_port_.prepare();
-    out.clear();
-    out.addInt16(1);
-    return true;
+    if ((dx * dx + dy * dy) <= (goal_reached_tol_ * goal_reached_tol_) && (std::abs(yaw) <= goal_angular_tol_))
+    {
+      if (publish_info_)
+      {
+        RCLCPP_INFO(node_->get_logger(), "[GoalReachedConditionModded] Publishing Info!");
+        auto& out = yarp_port_.prepare();
+        out.clear();
+        out.addInt16(1);  //Goal NOT Reached
+        yarp_port_.write();
+      }
+      return true;
+    }
+    else
+    {
+      if (publish_info_)
+      {
+        RCLCPP_INFO(node_->get_logger(), "[GoalReachedConditionModded] Publishing Info!");
+        auto& out = yarp_port_.prepare();
+        out.clear();
+        out.addInt16(0);  //Goal Reached
+        yarp_port_.write();
+      }
+      return false;
+    }
   }
-  else
+  else  // DON'T check angular alignment with goal
   {
-    auto& out = yarp_port_.prepare();
-    out.clear();
-    out.addInt16(0);
-    return false;
+    if ((dx * dx + dy * dy) <= (goal_reached_tol_ * goal_reached_tol_))
+    {
+      if (publish_info_)
+      {
+        RCLCPP_INFO(node_->get_logger(), "[GoalReachedConditionModded] Publishing Info!");
+        auto& out = yarp_port_.prepare();
+        out.clear();
+        out.addInt16(1);  //Goal NOT Reached
+        yarp_port_.write();
+      }
+      return true;
+    }
+    else
+    {
+      if (publish_info_)
+      {
+        RCLCPP_INFO(node_->get_logger(), "[GoalReachedConditionModded] Publishing Info!");
+        auto& out = yarp_port_.prepare();
+        out.clear();
+        out.addInt16(0);  //Goal Reached
+        yarp_port_.write();
+      }
+      return false;
+    }
   }
 }
 

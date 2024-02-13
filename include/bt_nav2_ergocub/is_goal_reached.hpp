@@ -101,7 +101,10 @@ private:
   double transform_tolerance_;
 
   std::string nav_status_port_name_;
+  std::string perception_bt_port_name_;
   double goal_angular_tol_;
+  bool publish_info_;
+  bool check_angular_alignment_ = false;
 
   yarp::os::Network yarp;
   yarp::os::BufferedPort<yarp::os::Bottle> yarp_port_;
