@@ -179,8 +179,8 @@ bool GoalReachedConditionModded::isGoalReached()
         RCLCPP_INFO(node_->get_logger(), "[GoalReachedConditionModded] Publishing Info!");
         auto& out = yarp_port_.prepare();
         out.clear();
-        out.addInt16(1);  //Goal NOT Reached
-        yarp_port_.write();
+        out.addInt32(1);  //Goal NOT Reached
+        //yarp_port_.write();
       }
       return true;
     }
@@ -191,8 +191,8 @@ bool GoalReachedConditionModded::isGoalReached()
         RCLCPP_INFO(node_->get_logger(), "[GoalReachedConditionModded] Publishing Info!");
         auto& out = yarp_port_.prepare();
         out.clear();
-        out.addInt16(0);  //Goal Reached
-        yarp_port_.write();
+        out.addInt32(0);  //Goal Reached
+        //yarp_port_.write();
       }
       return false;
     }
@@ -206,8 +206,8 @@ bool GoalReachedConditionModded::isGoalReached()
         RCLCPP_INFO(node_->get_logger(), "[GoalReachedConditionModded] Publishing Info!");
         auto& out = yarp_port_.prepare();
         out.clear();
-        out.addInt16(1);  //Goal NOT Reached
-        yarp_port_.write();
+        out.addInt32(1);  //Goal NOT Reached
+        //yarp_port_.write();
       }
       return true;
     }
@@ -218,8 +218,8 @@ bool GoalReachedConditionModded::isGoalReached()
         RCLCPP_INFO(node_->get_logger(), "[GoalReachedConditionModded] Publishing Info!");
         auto& out = yarp_port_.prepare();
         out.clear();
-        out.addInt16(0);  //Goal Reached
-        yarp_port_.write();
+        out.addInt32(0);  //Goal Reached
+        //yarp_port_.write();
       }
       return false;
     }
