@@ -94,6 +94,12 @@ void GoalReachedConditionModded::initialize()
   }
   std::cout << "[GoalReachedConditionModded] goal_reached_tol: " << goal_reached_tol_ << std::endl;
 
+  nav2_util::declare_parameter_if_not_declared(
+    node_, "check_angular_alignment",
+    rclcpp::ParameterValue(false));
+  node_->get_parameter<bool>("check_angular_alignment", check_angular_alignment_);
+  RCLCPP_INFO_STREAM(node_->get_logger(), "[GoalReachedConditionModded] Using check_angular_alignment: " << check_angular_alignment_);
+
   tf_ = config().blackboard->get<std::shared_ptr<tf2_ros::Buffer>>("tf_buffer");
 
   yarp_port_.open(nav_status_port_name_);

@@ -5,11 +5,11 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/include/**",
-                "/opt/ros/humble/include/**",
+                "/opt/ros/iron/include/**",
                 "/usr/include/eigen3/**",
                 "/usr/include/pcl-1.12/**",
-                "/opt/ros/humble/include/nav_msgs",
-                "/home/ecub_docker/robotology-superbuild/build/install/include/"
+                "/opt/ros/iron/include/nav_msgs",
+                "/home/ecub_docker/yarp/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
