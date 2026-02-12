@@ -19,7 +19,8 @@
 #include <memory>
 
 #include "rclcpp/rclcpp.hpp"
-#include "behaviortree_cpp_v3/condition_node.h"
+
+#include "behaviortree_cpp/condition_node.h"
 #include "tf2_ros/buffer.h"
 #include "std_msgs/msg/bool.hpp"
 

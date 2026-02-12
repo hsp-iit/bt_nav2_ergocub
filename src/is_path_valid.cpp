@@ -64,7 +64,7 @@ BT::NodeStatus IsPathValidConditionModded::tick()
 
 }  // namespace bt_nav2_ergocub
 
-#include "behaviortree_cpp_v3/bt_factory.h"
+#include "behaviortree_cpp/bt_factory.h"
 BT_REGISTER_NODES(factory)
 {
   factory.registerNodeType<bt_nav2_ergocub::IsPathValidConditionModded>("IsPathValidConditionModded");

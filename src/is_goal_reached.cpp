@@ -23,6 +23,8 @@
 
 #include "yarp/os/Network.h"
 #include "tf2/LinearMath/Matrix3x3.h"
+#include "tf2/utils.h"
+
 
 using namespace std::literals::chrono_literals;
 
@@ -158,22 +160,25 @@ bool GoalReachedConditionModded::isGoalReached()
   tf2::fromMsg(goal.pose.orientation, q_goal);
   tf2::Quaternion q_pose;
   tf2::fromMsg(current_pose.pose.orientation, q_pose);
-  tf2::Matrix3x3 m_g(q_goal);
-  double r_g, p_g, yaw_g;
-  m_g.getRPY(r_g, p_g, yaw_g);
-  tf2::Matrix3x3 m_p(q_pose);
-  double r_p, p_p, yaw_p;
-  m_p.getRPY(r_p, p_p, yaw_p);
+  //tf2::Matrix3x3 m_g(q_goal);
+  //double r_g, p_g, yaw_g;
+  //m_g.getRPY(r_g, p_g, yaw_g);
+  double yaw_g = tf2::getYaw(q_goal);
+  //tf2::Matrix3x3 m_p(q_pose);
+  //double r_p, p_p, yaw_p;
+  //m_p.getRPY(r_p, p_p, yaw_p);
+  double yaw_p = tf2::getYaw(q_pose);
 
-  tf2::Matrix3x3 m(q_goal*q_pose.inverse());
-  double r, p, yaw;
-  m.getRPY(r, p, yaw);
-  std::cout << "[GoalReachedConditionModded] relative yaw difference rad: " << yaw << " degrees: " << yaw * 180 / M_PI << std::endl;
-  std::cout << "[GoalReachedConditionModded] pose yaw rad: " << yaw_p << " degrees: " << yaw_p * 180 / M_PI << std::endl;
-  std::cout << "[GoalReachedConditionModded] Goal X: " << goal.pose.position.x << " Y: " << goal.pose.position.y << " Yaw: " << yaw_g << std::endl;
-  std::cout << "[GoalReachedConditionModded] Current Pose X: " << current_pose.pose.position.x << " Y: " << current_pose.pose.position.y << std::endl;
-  std::cout << "[GoalReachedConditionModded] Distance: " << std::sqrt(dx * dx + dy * dy) << std::endl;
-  std::cout << "[GoalReachedConditionModded] Global Frame: " << global_frame_ << " Robot Frame: " << robot_base_frame_ << std::endl;
+  //tf2::Matrix3x3 m(q_goal*q_pose.inverse());
+  //double r, p, yaw;
+  //m.getRPY(r, p, yaw);
+  double yaw = tf2::getYaw(q_goal * q_pose.inverse());
+  RCLCPP_INFO_STREAM(node_->get_logger(),"[GoalReachedConditionModded] relative yaw difference rad: " << yaw << " degrees: " << yaw * 180 / M_PI );
+  RCLCPP_INFO_STREAM(node_->get_logger(),"[GoalReachedConditionModded] pose yaw rad: " << yaw_p << " degrees: " << yaw_p * 180 / M_PI );
+  RCLCPP_INFO_STREAM(node_->get_logger(),"[GoalReachedConditionModded] Goal X: " << goal.pose.position.x << " Y: " << goal.pose.position.y << " Yaw: " << yaw_g );
+  RCLCPP_INFO_STREAM(node_->get_logger(),"[GoalReachedConditionModded] Current Pose X: " << current_pose.pose.position.x << " Y: " << current_pose.pose.position.y );
+  RCLCPP_INFO_STREAM(node_->get_logger(),"[GoalReachedConditionModded] Distance: " << std::sqrt(dx * dx + dy * dy) );
+  RCLCPP_INFO_STREAM(node_->get_logger(),"[GoalReachedConditionModded] Global Frame: " << global_frame_ << " Robot Frame: " << robot_base_frame_ );
 
   //if we have to check for angular alignment
   if (check_angular_alignment_)
@@ -234,7 +239,7 @@ bool GoalReachedConditionModded::isGoalReached()
 
 }  // namespace ergocub_nav2_nodes
 
-#include "behaviortree_cpp_v3/bt_factory.h"
+#include "behaviortree_cpp/bt_factory.h"
 BT_REGISTER_NODES(factory)
 {
   factory.registerNodeType<ergocub_nav2_nodes::GoalReachedConditionModded>("GoalReachedConditionModded");

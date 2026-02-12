@@ -29,7 +29,7 @@
 #include <std_srvs/srv/trigger.hpp>
 #include <string>
 
-#include "behaviortree_cpp_v3/decorator_node.h"
+#include "behaviortree_cpp/decorator_node.h"
 
 namespace bt_nav2_ergocub
 {

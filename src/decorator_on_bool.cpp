@@ -21,8 +21,8 @@
  *   SOFTWARE.
  */
 
-#include <behaviortree_cpp_v3/bt_factory.h>
-#include <behaviortree_cpp_v3/decorator_node.h>
+#include <behaviortree_cpp/bt_factory.h>
+#include <behaviortree_cpp/decorator_node.h>
 
 #include <bt_nav2_ergocub/decorator_on_bool.hpp>
 
