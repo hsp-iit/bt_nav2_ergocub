@@ -46,11 +46,11 @@ include_directories(include)
 
 set(LIBRARY_NAME ${PROJECT_NAME}_core)
 
-add_library(${LIBRARY_NAME} SHARED
+add_library(decorator_on_bool SHARED
   src/decorator_on_bool.cpp
 )
-ament_target_dependencies(${LIBRARY_NAME} ${DEPENDENCIES})
-target_compile_definitions(${LIBRARY_NAME} PRIVATE BT_PLUGIN_EXPORT)
+ament_target_dependencies(decorator_on_bool ${DEPENDENCIES})
+target_compile_definitions(decorator_on_bool PRIVATE BT_PLUGIN_EXPORT)
 
 add_library(is_goal_reached SHARED src/is_goal_reached.cpp)
 list(APPEND plugin_libs is_goal_reached)
@@ -63,7 +63,7 @@ ament_target_dependencies(is_path_valid ${DEPENDENCIES})
 target_compile_definitions(is_path_valid PRIVATE BT_PLUGIN_EXPORT)
 
 install(TARGETS
-  ${LIBRARY_NAME}
+  decorator_on_bool
   is_goal_reached
   is_path_valid
   ARCHIVE DESTINATION lib
@@ -89,7 +89,7 @@ if(BUILD_TESTING)
 endif()
 
 ament_export_include_directories(include)
-ament_export_libraries(${LIBRARY_NAME})
+ament_export_libraries(decorator_on_bool is_goal_reached is_path_valid)
 ament_export_dependencies(${DEPENDENCIES})
 
 ament_package()

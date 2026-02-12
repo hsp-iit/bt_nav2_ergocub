@@ -28,7 +28,7 @@
 
 using namespace std::literals::chrono_literals;
 
-namespace ergocub_nav2_nodes
+namespace bt_nav2_ergocub
 {
 
 GoalReachedConditionModded::GoalReachedConditionModded(
@@ -46,7 +46,6 @@ GoalReachedConditionModded::GoalReachedConditionModded(
 
 GoalReachedConditionModded::~GoalReachedConditionModded()
 {
-  //yarp.fini();
   cleanup();
 }
 
@@ -237,10 +236,15 @@ bool GoalReachedConditionModded::isGoalReached()
   }
 }
 
-}  // namespace ergocub_nav2_nodes
+}  // namespace bt_nav2_ergocub
 
 #include "behaviortree_cpp/bt_factory.h"
 BT_REGISTER_NODES(factory)
 {
-  factory.registerNodeType<ergocub_nav2_nodes::GoalReachedConditionModded>("GoalReachedConditionModded");
+  //BT::NodeBuilder builder =
+  //  [](const std::string & name, const BT::NodeConfiguration & config)
+  //  {
+  //    return std::make_unique<bt_nav2_ergocub::GoalReachedConditionModded>(name, config);
+  //  };
+  factory.registerNodeType<bt_nav2_ergocub::GoalReachedConditionModded>("GoalReachedConditionModded");
 }

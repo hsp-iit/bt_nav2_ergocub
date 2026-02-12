@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ERGOCUB_NAV2_NODES__GOAL_REACHED_CONDITION_MODDED_HPP_
-#define ERGOCUB_NAV2_NODES__GOAL_REACHED_CONDITION_MODDED_HPP_
+#ifndef BT_NAV2_ERGOCUB__GOAL_REACHED_CONDITION_MODDED_HPP_
+#define BT_NAV2_ERGOCUB__GOAL_REACHED_CONDITION_MODDED_HPP_
 
 #include <string>
 #include <memory>
@@ -28,7 +28,7 @@
 #include "yarp/os/Network.h"
 #include "yarp/os/Bottle.h"
 
-namespace ergocub_nav2_nodes
+namespace bt_nav2_ergocub
 {
 
 /**
@@ -115,4 +115,4 @@ private:
 
 }  // namespace ergocub_nav2_nodes
 
-#endif  // ERGOCUB_NAV2_NODES__GOAL_REACHED_CONDITION_MODDED_HPP_
+#endif  // BT_NAV2_ERGOCUB__GOAL_REACHED_CONDITION_MODDED_HPP_

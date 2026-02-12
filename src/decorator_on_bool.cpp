@@ -105,7 +105,7 @@ namespace bt_nav2_ergocub
       return status();
    }
 
-}  // namespace nav2_behavior_tree
+}  // namespace bt_nav2_ergocub
 
 BT_REGISTER_NODES(factory)
 {
