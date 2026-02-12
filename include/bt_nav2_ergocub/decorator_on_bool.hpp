@@ -42,7 +42,7 @@ namespace bt_nav2_ergocub
    {
   public:
       DecoratorOnBool(const std::string& name, const BT::NodeConfiguration& conf);
-    static BT::PortsList providedPorts() { return {BT::InputPort<std::string>("service_name")}; }
+    static BT::PortsList providedPorts() { return {BT::InputPort<std::string>("service_name", "is_on_double_support_srv")}; }
 
 
       BT::NodeStatus tick() override;
