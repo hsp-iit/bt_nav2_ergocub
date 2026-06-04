@@ -21,7 +21,6 @@
 
 #include "bt_nav2_ergocub/is_goal_reached.hpp"
 
-#include "yarp/os/Network.h"
 #include "tf2/LinearMath/Matrix3x3.h"
 #include "tf2/utils.h"
 
@@ -39,7 +38,6 @@ GoalReachedConditionModded::GoalReachedConditionModded(
   global_frame_("map"),
   robot_base_frame_("base_link")
 {
-  publish_info_ = false;
   getInput("global_frame", global_frame_);
   getInput("robot_base_frame", robot_base_frame_);
 }
@@ -51,29 +49,7 @@ GoalReachedConditionModded::~GoalReachedConditionModded()
 
 void GoalReachedConditionModded::initialize()
 {
-  std::cout << "[GoalReachedConditionModded] init..." << std::endl;
-  //yarp.init();
   node_ = config().blackboard->get<rclcpp::Node::SharedPtr>("node");
-
-  nav2_util::declare_parameter_if_not_declared(
-    node_, "nav_status_port_name",
-    rclcpp::ParameterValue("/is_goal_reached_bt/goal_reached:o"));
-  node_->get_parameter<std::string>("nav_status_port_name", nav_status_port_name_);
-  if (nav_status_port_name_=="")
-  {
-    nav_status_port_name_ = "/is_goal_reached_bt/goal_reached:o";
-  }
-  std::cout << "[GoalReachedConditionModded] nav_status_port_name: " << nav_status_port_name_ << std::endl;
-
-  nav2_util::declare_parameter_if_not_declared(
-    node_, "perception_bt_port_name",
-    rclcpp::ParameterValue("/BT/RobotNavigating"));
-  node_->get_parameter<std::string>("perception_bt_port_name", perception_bt_port_name_);
-  if (perception_bt_port_name_=="")
-  {
-    perception_bt_port_name_ = "/BT/RobotNavigating";
-  }
-  std::cout << "[GoalReachedConditionModded] nav_status_port_name: " << perception_bt_port_name_ << std::endl;
 
   nav2_util::declare_parameter_if_not_declared(
     node_, "goal_angular_tol",
@@ -83,7 +59,7 @@ void GoalReachedConditionModded::initialize()
   {
     goal_angular_tol_=0.1;
   }
-  std::cout << "[GoalReachedConditionModded] goal_angular_tol: " << goal_angular_tol_ << std::endl;
+  RCLCPP_INFO_STREAM(node_->get_logger(), "[GoalReachedConditionModded] goal_angular_tol: " << goal_angular_tol_);
 
   nav2_util::declare_parameter_if_not_declared(
     node_, "goal_reached_tol",
@@ -93,7 +69,7 @@ void GoalReachedConditionModded::initialize()
   {
     goal_angular_tol_=0.05;
   }
-  std::cout << "[GoalReachedConditionModded] goal_reached_tol: " << goal_reached_tol_ << std::endl;
+  RCLCPP_INFO_STREAM(node_->get_logger(), "[GoalReachedConditionModded] goal_reached_tol: " << goal_reached_tol_);
 
   nav2_util::declare_parameter_if_not_declared(
     node_, "check_angular_alignment",
@@ -102,19 +78,6 @@ void GoalReachedConditionModded::initialize()
   RCLCPP_INFO_STREAM(node_->get_logger(), "[GoalReachedConditionModded] Using check_angular_alignment: " << check_angular_alignment_);
 
   tf_ = config().blackboard->get<std::shared_ptr<tf2_ros::Buffer>>("tf_buffer");
-
-  yarp_port_.open(nav_status_port_name_);
-  // YARP connection check
-  yarp::os::Network::connect(nav_status_port_name_, perception_bt_port_name_);
-  if(yarp::os::Network::isConnected(nav_status_port_name_, perception_bt_port_name_))
-  {
-      RCLCPP_INFO(node_->get_logger(), "YARP Ports connected successfully");
-      publish_info_ = true;
-  } 
-  else 
-  {
-    publish_info_=false;
-  }
 
   node_->get_parameter("transform_tolerance", transform_tolerance_);
 
@@ -159,51 +122,27 @@ bool GoalReachedConditionModded::isGoalReached()
   tf2::fromMsg(goal.pose.orientation, q_goal);
   tf2::Quaternion q_pose;
   tf2::fromMsg(current_pose.pose.orientation, q_pose);
-  //tf2::Matrix3x3 m_g(q_goal);
-  //double r_g, p_g, yaw_g;
-  //m_g.getRPY(r_g, p_g, yaw_g);
+
   double yaw_g = tf2::getYaw(q_goal);
-  //tf2::Matrix3x3 m_p(q_pose);
-  //double r_p, p_p, yaw_p;
-  //m_p.getRPY(r_p, p_p, yaw_p);
   double yaw_p = tf2::getYaw(q_pose);
-
-  //tf2::Matrix3x3 m(q_goal*q_pose.inverse());
-  //double r, p, yaw;
-  //m.getRPY(r, p, yaw);
   double yaw = tf2::getYaw(q_goal * q_pose.inverse());
-  RCLCPP_INFO_STREAM(node_->get_logger(),"[GoalReachedConditionModded] relative yaw difference rad: " << yaw << " degrees: " << yaw * 180 / M_PI );
-  RCLCPP_INFO_STREAM(node_->get_logger(),"[GoalReachedConditionModded] pose yaw rad: " << yaw_p << " degrees: " << yaw_p * 180 / M_PI );
-  RCLCPP_INFO_STREAM(node_->get_logger(),"[GoalReachedConditionModded] Goal X: " << goal.pose.position.x << " Y: " << goal.pose.position.y << " Yaw: " << yaw_g );
-  RCLCPP_INFO_STREAM(node_->get_logger(),"[GoalReachedConditionModded] Current Pose X: " << current_pose.pose.position.x << " Y: " << current_pose.pose.position.y );
-  RCLCPP_INFO_STREAM(node_->get_logger(),"[GoalReachedConditionModded] Distance: " << std::sqrt(dx * dx + dy * dy) );
-  RCLCPP_INFO_STREAM(node_->get_logger(),"[GoalReachedConditionModded] Global Frame: " << global_frame_ << " Robot Frame: " << robot_base_frame_ );
+  RCLCPP_INFO_STREAM(node_->get_logger(), "[GoalReachedConditionModded] relative yaw difference rad: " << yaw << " degrees: " << yaw * 180 / M_PI);
+  RCLCPP_INFO_STREAM(node_->get_logger(), "[GoalReachedConditionModded] pose yaw rad: " << yaw_p << " degrees: " << yaw_p * 180 / M_PI);
+  RCLCPP_INFO_STREAM(node_->get_logger(), "[GoalReachedConditionModded] Goal X: " << goal.pose.position.x << " Y: " << goal.pose.position.y << " Yaw: " << yaw_g);
+  RCLCPP_INFO_STREAM(node_->get_logger(), "[GoalReachedConditionModded] Current Pose X: " << current_pose.pose.position.x << " Y: " << current_pose.pose.position.y);
+  RCLCPP_INFO_STREAM(node_->get_logger(), "[GoalReachedConditionModded] Distance: " << std::sqrt(dx * dx + dy * dy));
+  //RCLCPP_INFO_STREAM(node_->get_logger(), "[GoalReachedConditionModded] Global Frame: " << global_frame_ << " Robot Frame: " << robot_base_frame_);
+  //RCLCPP_INFO_STREAM(node_->get_logger(), "[GoalReachedConditionModded] Angular tol: " << goal_angular_tol_ );
+  //RCLCPP_INFO_STREAM(node_->get_logger(), "[GoalReachedConditionModded] goal_reached_tol_: " << goal_reached_tol_);
 
-  //if we have to check for angular alignment
   if (check_angular_alignment_)
   {
     if ((dx * dx + dy * dy) <= (goal_reached_tol_ * goal_reached_tol_) && (std::abs(yaw) <= goal_angular_tol_))
     {
-      if (publish_info_)
-      {
-        RCLCPP_INFO(node_->get_logger(), "[GoalReachedConditionModded] Publishing Info!");
-        auto& out = yarp_port_.prepare();
-        out.clear();
-        out.addInt32(1);  //Goal NOT Reached
-        //yarp_port_.write();
-      }
       return true;
     }
     else
     {
-      if (publish_info_)
-      {
-        RCLCPP_INFO(node_->get_logger(), "[GoalReachedConditionModded] Publishing Info!");
-        auto& out = yarp_port_.prepare();
-        out.clear();
-        out.addInt32(0);  //Goal Reached
-        //yarp_port_.write();
-      }
       return false;
     }
   }
@@ -211,26 +150,10 @@ bool GoalReachedConditionModded::isGoalReached()
   {
     if ((dx * dx + dy * dy) <= (goal_reached_tol_ * goal_reached_tol_))
     {
-      if (publish_info_)
-      {
-        RCLCPP_INFO(node_->get_logger(), "[GoalReachedConditionModded] Publishing Info!");
-        auto& out = yarp_port_.prepare();
-        out.clear();
-        out.addInt32(1);  //Goal NOT Reached
-        //yarp_port_.write();
-      }
       return true;
     }
     else
     {
-      if (publish_info_)
-      {
-        RCLCPP_INFO(node_->get_logger(), "[GoalReachedConditionModded] Publishing Info!");
-        auto& out = yarp_port_.prepare();
-        out.clear();
-        out.addInt32(0);  //Goal Reached
-        //yarp_port_.write();
-      }
       return false;
     }
   }
@@ -241,10 +164,5 @@ bool GoalReachedConditionModded::isGoalReached()
 #include "behaviortree_cpp/bt_factory.h"
 BT_REGISTER_NODES(factory)
 {
-  //BT::NodeBuilder builder =
-  //  [](const std::string & name, const BT::NodeConfiguration & config)
-  //  {
-  //    return std::make_unique<bt_nav2_ergocub::GoalReachedConditionModded>(name, config);
-  //  };
   factory.registerNodeType<bt_nav2_ergocub::GoalReachedConditionModded>("GoalReachedConditionModded");
 }

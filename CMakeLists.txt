@@ -23,7 +23,6 @@ find_package(tf2_geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(nav2_util REQUIRED)
 find_package(nav2_core REQUIRED)
-find_package(YARP COMPONENTS os REQUIRED)
 
 set(DEPENDENCIES
   behaviortree_cpp
@@ -54,7 +53,7 @@ target_compile_definitions(decorator_on_bool PRIVATE BT_PLUGIN_EXPORT)
 
 add_library(is_goal_reached SHARED src/is_goal_reached.cpp)
 list(APPEND plugin_libs is_goal_reached)
-ament_target_dependencies(is_goal_reached ${DEPENDENCIES} YARP)
+ament_target_dependencies(is_goal_reached ${DEPENDENCIES})
 target_compile_definitions(is_goal_reached PRIVATE BT_PLUGIN_EXPORT)
 
 add_library(is_path_valid SHARED src/is_path_valid.cpp)

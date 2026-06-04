@@ -24,9 +24,6 @@
 #include "tf2_ros/buffer.h"
 #include "std_msgs/msg/bool.hpp"
 
-#include "yarp/os/BufferedPort.h"
-#include "yarp/os/Network.h"
-#include "yarp/os/Bottle.h"
 
 namespace bt_nav2_ergocub
 {
@@ -101,15 +98,9 @@ private:
   std::string robot_base_frame_;
   double transform_tolerance_;
 
-  std::string nav_status_port_name_;
-  std::string perception_bt_port_name_;
   double goal_angular_tol_;
-  bool publish_info_;
   bool check_angular_alignment_ = false;
 
-  yarp::os::Network yarp;
-  yarp::os::BufferedPort<yarp::os::Bottle> yarp_port_;
-  
   rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr goal_state_pub_;
 };
 
